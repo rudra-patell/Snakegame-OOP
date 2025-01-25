@@ -51,25 +51,6 @@ SnakeGame-OOP/
 ├── .gitignore      # Git ignore file
 ```
 
----
-
-## Contribution Guidelines
-1. Fork the repository.
-2. Create a feature branch:
-   ```bash
-   git checkout -b feature/feature-name
-   ```
-3. Commit your changes:
-   ```bash
-   git commit -m "Add feature: feature-name"
-   ```
-4. Push your branch:
-   ```bash
-   git push origin feature/feature-name
-   ```
-5. Open a Pull Request.
-
----
 
 ## `.gitignore` File for C++
 ```plaintext
