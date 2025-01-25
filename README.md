@@ -22,7 +22,7 @@ A classic Snake game implemented in C++ using Object-Oriented Programming princi
 ### Running the Game
 1. Clone the repository:
    ```bash
-   git clone https://github.com/<your-username>/SnakeGame-OOP.git
+   git clone https://github.com/rudra-patell/SnakeGame-OOP.git
    cd SnakeGame-OOP/src
    ```
 2. Compile the code:
