@@ -6,9 +6,12 @@
 
 using namespace std;
 
+//  basic required functions and global variables
 const int WIDTH = 50;
 const int HEIGHT = 25;
 int map[HEIGHT][WIDTH];
+int difficulty=50;
+bool testing_mode=false;
 
 void gotoxy(int x, int y){
     COORD c;
@@ -22,7 +25,9 @@ void hideCursor(){
     cursor.dwSize = 100;
     cursor.bVisible = false;
     SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursor);
-}
+} 
+
+//classes 
 
 class Game{
 private:
@@ -33,20 +38,20 @@ private:
 public:
     Game() : gameOver(false), score(0), ateFood(false) {}
     
-    bool isGameOver() { return gameOver; }
-    void setGameOver(bool state) { gameOver = state; }
-    int getScore() { return score; }
-    void incrementScore() { score++; }
-    bool hasEatenFood() { return ateFood; }
-    void setAteFood(bool state) { ateFood = state; }
+    bool isGameOver() {return gameOver;}
+    void setGameOver(bool state) {gameOver = state;}
+    int getScore() { return score;}
+    void incrementScore() {score++; }
+    bool hasEatenFood() {return ateFood; }
+    void setAteFood(bool state) {ateFood = state; }
 };
 
 class Snake{
 private:
-    int x, y;
+    int x, y;   //coordinates for head
     vector<int> xTail;
     vector<int> yTail;
-    int nTail;
+    int nTail;  //length of tail 
     char dir;
     int delay;
     int count_delay;
@@ -56,7 +61,7 @@ public:
     Snake(Game* gameInstance) : game(gameInstance), nTail(10), dir('U'), delay(3), count_delay(0) {
         x = WIDTH / 2;
         y = HEIGHT / 2;
-        for (int i = 0; i < nTail; i++) {
+        for (int i =0;i <nTail;i++) {
             xTail.push_back(WIDTH / 2);
             yTail.push_back(HEIGHT / 2 + i);
         }
@@ -64,7 +69,12 @@ public:
 
     void draw() { map[y][x] = 1; }
     void drawTails() {
-        for (int i = 0; i < nTail; i++) map[yTail[i]][xTail[i]] = 2;
+        for (int i = 0;i <nTail;i++){
+
+        map[yTail[i]][xTail[i]] = 2;
+
+        }
+
     }
 
     void move() {
@@ -80,11 +90,11 @@ public:
     }
 
     void moveTails() {
-        if (nTail > int(xTail.size())) {
+        if (nTail > int(xTail.size())) { //resizeing the vectors to store more data(double size than before)
             xTail.push_back(xTail.back());
             yTail.push_back(yTail.back());
         }
-
+// updating the parts of body
         int prevX = xTail[0];
         int prevY = yTail[0];
         int tempX, tempY;
@@ -101,11 +111,12 @@ public:
             prevY = tempY;
         }
 
-        map[prevY][prevX] = 0;
+        map[prevY][prevX] = 0; //clearing the remaining parts of body
     }
 
     bool collision(int x, int y) {
-        if (map[y][x] == 9 || map[y][x] == 2) game->setGameOver(true);
+
+        if (map[y][x] == 9 || map[y][x] == 2) game->setGameOver(true); //here 9=bordered collision and 2= collision with boady
         if (map[y][x] == 3) {
             game->incrementScore();
             nTail++;
@@ -144,10 +155,10 @@ Snake snake(&game);
 Food food;
 
 void layout(){
-    for(int i = 0; i < HEIGHT; i++){
-        for(int j = 0; j < WIDTH; j++){
-            if(i == 0 || i == HEIGHT-1 || j == 0 || j == WIDTH-1) map[i][j] = 9;
-            else map[i][j] = 0;
+    for(int i= 0;i <HEIGHT;i++){
+        for(int j= 0; j <WIDTH; j++){
+            if(i== 0 || i ==HEIGHT-1 || j ==0 || j ==WIDTH-1) map[i][j] = 9;
+            else map[i][j]= 0; //empty space
         }
     }
 }
@@ -161,14 +172,14 @@ void display(){
     snake.drawTails();
     food.draw();
 
-    for(int i = 0; i < HEIGHT; i++){
-        for(int j = 0; j < WIDTH; j++){
+    for(int i =0; i <HEIGHT; i++){
+        for(int j =0; j< WIDTH;j++){
             gotoxy(j+2, i+3);
-            if(map[i][j] == 9) cout << char(219);
-            if(map[i][j] == 1) cout << char(79);
-            if(map[i][j] == 2) cout << char(111);
-            if(map[i][j] == 3) cout << char(232);
-            if(map[i][j] == 0) cout << char(32);
+            if(map[i][j] == 9) cout << char(219); //border
+            if(map[i][j] == 1) cout << 'O';  //snake head
+            if(map[i][j] == 2) cout << 'o';  //snake tail
+            if(map[i][j] == 3) cout << char(232); //food
+            if(map[i][j] == 0) cout << ' '; //food
         }
     }
 }
@@ -192,16 +203,54 @@ void movements(){
         game.setAteFood(false);
     }
 }
+void setColor(int color) { //color for console fonts
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
+}
+
+void gameOverScreen() {
+    system("cls"); 
+    gotoxy(WIDTH/2 -5, HEIGHT/2 - 2);
+    setColor(4);
+    cout << "GAME OVER!";
+    setColor(1);
+    gotoxy(WIDTH/2- 10, HEIGHT/2);
+    cout << "Score: " << game.getScore();
+    gotoxy(WIDTH/2 - 15, HEIGHT/2 + 2);
+    setColor(2); 
+    cout << "Press 'R' to Restart or 'Q' to Quit";
+    setColor(7); //white
+
+    while (true) {
+        if (_kbhit()) {
+            char choice = _getch();
+            if (choice == 'r' || choice == 'R') {
+                break;  // restart the game
+            } else if (choice == 'q' || choice == 'Q') {
+                exit(0);
+            }
+        }
+    }
+}
 
 int main(){
-    HWND s = GetConsoleWindow();
+    HWND s = GetConsoleWindow(); //idea from stackoverflow
     MoveWindow(s, 300, 100, 480, 620, true);
     hideCursor();
     system("cls");
+
+RESTART:
+    system("cls");
+    game = Game();
+    snake = Snake(&game);
+    food = Food();
     while(!game.isGameOver()){
         display();
         input();
         movements();
         Sleep(50);
     }
+    gameOverScreen();
+    goto RESTART;
+
+    return 0;
 }
