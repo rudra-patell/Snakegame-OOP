@@ -7,11 +7,11 @@
 using namespace std;
 
 //  basic required functions and global variables
-const int WIDTH = 50;
-const int HEIGHT = 25;
+int const WIDTH = 50; //change these if you have difficulty with displaying
+int const HEIGHT = 25;
 int map[HEIGHT][WIDTH];
-int difficulty=50;
-bool testing_mode=false;
+int difficulty=1;
+
 
 void gotoxy(int x, int y){
     COORD c;
@@ -26,6 +26,9 @@ void hideCursor(){
     cursor.bVisible = false;
     SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursor);
 } 
+void setColor(int color) { //color for console fonts
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
+}
 
 //classes 
 
@@ -58,7 +61,7 @@ private:
     Game* game;
 
 public:
-    Snake(Game* gameInstance) : game(gameInstance), nTail(10), dir('U'), delay(3), count_delay(0) {
+    Snake(Game* gameInstance) : game(gameInstance), nTail(3), dir('U'), delay(4), count_delay(0) {
         x = WIDTH / 2;
         y = HEIGHT / 2;
         for (int i =0;i <nTail;i++) {
@@ -78,7 +81,7 @@ public:
     }
 
     void move() {
-        if(count_delay == delay){
+        if(count_delay == delay- difficulty){
             moveTails();
             if(dir =='U' && !collision(x, y-1)) y--;
             if(dir =='D' && !collision(x, y+1)) y++;
@@ -154,6 +157,80 @@ Game game;
 Snake snake(&game);
 Food food;
 
+void Startmenu(){
+    system("cls");
+    setColor(11); //Light blue color
+    cout<<"\n\n\tWelcome to Snake Game by Team Falcons!\n\n"<<endl;
+    setColor(6); //Yellow color
+    cout<<"             \t1. Start Game"<<endl;
+    cout<<"             \t2. Set Difficulty"<<endl;
+    cout<<"             \t3. Set Grid Size"<<endl;
+    cout<<"             \t4. Exit Game"<<endl;
+    setColor(7); //White color
+
+    int choice;
+    cin>>choice;
+
+    switch(choice){
+        case 1:
+            break;
+        case 2:
+            system("cls");
+            setColor(1); //blue
+            cout<<"Choose Difficulty(1-Easy 2-Medium 3-Hard):  ";
+            int diff;
+            cin>>diff;
+            difficulty = (diff==1) ? 1 : (diff==2)? 2 : (diff==3)? 3: 4;
+
+            switch(difficulty){
+                case 1:
+                    cout<<"\n\n            \tDifficulty set to ";
+                    setColor(11); //cyan
+                    cout<<"1-Easy";
+                    Sleep(1000);
+                    break;
+                case 2:
+                    cout<<"\n\n            \tDifficulty set to ";
+                    setColor(14); //light yellow
+                    cout<<"2-Medium";
+                    Sleep(1000);
+                    break; 
+                case 3:
+                    cout<<"\n\n            \tDifficulty set to ";
+                    setColor(4);
+                    cout<<"3-Hard";
+                    Sleep(1000);
+                    break;
+                default:
+                    setColor(4); //red
+                    cout<<"\t           Invalid choice!"<<endl;
+                    cout<<"\t      difficulty set to 1-Easy(default)";
+                    Sleep(1000);
+                    difficulty=1;
+            }
+
+            setColor(7); //reset color
+            Startmenu();
+            break;
+
+        // case 3:
+        //     int x=-1,y=-1;
+        //     cout<<"Enter New Grid Size (Width x Height) enter numbers separeted by space: ";
+        //     cout<<"Default value: 50x25"<<endl;
+        //     cin>>x>>y;
+
+
+        case 4:
+            exit(0);
+            break;
+        default:
+            setColor(4); 
+            cout<<"\tInvalid Choice!";
+            Sleep(1000);
+            Startmenu();
+    }
+}
+
 void layout(){
     for(int i= 0;i <HEIGHT;i++){
         for(int j= 0; j <WIDTH; j++){
@@ -203,9 +280,7 @@ void movements(){
         game.setAteFood(false);
     }
 }
-void setColor(int color) { //color for console fonts
-    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
-}
+
 
 void gameOverScreen() {
     system("cls"); 
@@ -237,6 +312,7 @@ int main(){
     MoveWindow(s, 300, 100, 480, 620, true);
     hideCursor();
     system("cls");
+    Startmenu();
 
 RESTART:
     system("cls");
