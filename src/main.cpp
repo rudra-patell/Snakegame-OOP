@@ -1,16 +1,52 @@
 #include <iostream>
-#include <windows.h>
-#include <conio.h>
+#include <windows.h> 
+#include <conio.h> //for _kbhit()
 #include <time.h>
 #include <vector>
+#include <fstream> //for file handeling
 
 using namespace std;
 
+void writedata(int width, int height, int highscore){
+    ofstream file("userdata.txt",  std::ios::out | std::ios::trunc); //ios::trunc will always clear the file if it exists
+    if(file.is_open()){
+        file<<width<<endl;
+        file<<height<<endl;
+        file<<highscore<<endl;
+        file.close();
+    }
+    else{
+        cout<<"Unable to open file";
+    }
+}
+
+
+vector<int> readdata(){ //return the array of data [width, height, highscore]
+    ifstream file("userdata.txt");
+    if(file.is_open()){
+
+        vector<int>data(3, 0);
+
+        for(int i=0;i<3;i++){
+            file>>data[i];
+        }
+        file.close();
+        return data;
+    }else{
+        writedata(50, 25, 0); 
+        file.close();
+        return readdata(); //if file not found return default values
+    }
+}
+
 //  basic required functions and global variables
-int const WIDTH = 50; //change these if you have difficulty with displaying
-int const HEIGHT = 25;
-int map[HEIGHT][WIDTH];
+vector<int> data=readdata();
+int WIDTH = (data[0] > 2) ? data[0]: 50;
+int HEIGHT = (data[1] > 2) ? data[1]: 25;
+vector<vector<int>> map(HEIGHT, vector<int>(WIDTH, 0));//defining 2D vector as it can compile at runtime
+
 int difficulty=1;
+
 
 
 void gotoxy(int x, int y){
@@ -213,11 +249,52 @@ void Startmenu(){
             Startmenu();
             break;
 
-        // case 3:
-        //     int x=-1,y=-1;
-        //     cout<<"Enter New Grid Size (Width x Height) enter numbers separeted by space: ";
-        //     cout<<"Default value: 50x25"<<endl;
-        //     cin>>x>>y;
+        case 3:
+            unsigned int x,y;
+            system("cls");
+            cout<<"Enter New Grid Size (Width x Height) Current Value ["<<readdata()[0]<<'x'<<readdata()[1]<<"]: ";
+            cin>>x>>y;
+            if (cin.fail()) {  //cin.fail() detects the invalid input
+                cin.clear();  //this will clear the remaining buffer
+                cout<<"Invalid Input"<<endl;
+                Sleep(4000);
+                Startmenu();
+            }
+
+            if(x <15 || y <15 || x > 75 || y >30){
+                setColor(4); //red
+                cout<<"\n\n\n           Warning!!";
+                cout<<"\n\t     This Grid Size is not suggested game might not work properly \n\n\n";
+                setColor(1);// blue
+                cout<<"            Do You Want to Continue(y/n): ";
+
+                char ch;
+                cin>>ch;
+
+                if(ch== 'y' || ch =='Y'){
+                    writedata(x, y, data[2]);
+                    cout<<"\n           Grid Size Updated Please Restart The Game To See The Effect"<<endl;
+                    Sleep(4000);
+                    setColor(7);//white
+                    exit(0);
+                }
+                else{
+                    setColor(7);
+                    cout <<"Grid size set to Default value: "<<50<<'x'<<25<<endl;
+                    writedata(50, 25, data[2]);
+                }
+                writedata(x, y, data[2]);
+                cout<<"\n            Grid Size Updated Please Restart The Game To See The Effect"<<endl;
+                cout<<"              Restarting..."<<endl;
+                Sleep(3000);
+                exit(0);
+
+            }
+            writedata(x, y, data[2]);
+            cout<<"\n            Grid Size Updated Please Restart The Game To See The Effect"<<endl;
+            cout<<"              Restarting..."<<endl;
+            Sleep(3000);
+            exit(0);
 
 
         case 4:
@@ -242,7 +319,7 @@ void layout(){
 
 void display(){
     gotoxy(2,1); 
-    cout << "Score: " << game.getScore();
+    cout << "Score: " << game.getScore() << "   Highest: "<< readdata()[2];
 
     layout();
     snake.draw();
@@ -263,7 +340,9 @@ void display(){
 
 void input(){
     if(_kbhit()){
-        switch (_getch()) {
+        char ch=_getch();
+        FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE)); // clear extra inputs
+        switch (ch) {
             case 'w': if(snake.getDirection() != 'D') snake.setDirection('U'); break;
             case 's': if(snake.getDirection() != 'U') snake.setDirection('D'); break;
             case 'a': if(snake.getDirection() != 'R') snake.setDirection('L'); break;
@@ -290,6 +369,8 @@ void gameOverScreen() {
     setColor(1);
     gotoxy(WIDTH/2- 10, HEIGHT/2);
     cout << "Score: " << game.getScore();
+    gotoxy(WIDTH/2+ 5, HEIGHT/2);
+    cout << "Highest: " << readdata()[2];
     gotoxy(WIDTH/2 - 15, HEIGHT/2 + 2);
     setColor(2); 
     cout << "Press 'R' to Restart or 'Q' to Quit";
@@ -298,6 +379,7 @@ void gameOverScreen() {
     while (true) {
         if (_kbhit()) {
             char choice = _getch();
+
             if (choice == 'r' || choice == 'R') {
                 break;  // restart the game
             } else if (choice == 'q' || choice == 'Q') {
@@ -312,9 +394,10 @@ int main(){
     MoveWindow(s, 300, 100, 480, 620, true);
     hideCursor();
     system("cls");
-    Startmenu();
+
 
 RESTART:
+    Startmenu();
     system("cls");
     game = Game();
     snake = Snake(&game);
@@ -323,7 +406,8 @@ RESTART:
         display();
         input();
         movements();
-        Sleep(50);
+        Sleep(10);
+        if(game.getScore() > data[2]) writedata(WIDTH, HEIGHT, game.getScore()); //Updating High Score live in Runtime
     }
     gameOverScreen();
     goto RESTART;
