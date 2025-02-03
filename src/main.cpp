@@ -49,7 +49,7 @@ int difficulty=1;
 
 
 
-void gotoxy(int x, int y){
+void gotoxy(int x, int y){ //from stacksoverflow
     COORD c;
     c.X = x;
     c.Y = y;
@@ -62,7 +62,7 @@ void hideCursor(){
     cursor.bVisible = false;
     SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursor);
 } 
-void setColor(int color) { //color for console fonts
+void setColor(int color) { //color for console fonts(stack overflow)
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
 }
 
@@ -92,15 +92,13 @@ private:
     vector<int> yTail;
     int nTail;  //length of tail 
     char dir;
-    int delay;
-    int count_delay;
     Game* game;
 
 public:
-    Snake(Game* gameInstance) : game(gameInstance), nTail(3), dir('U'), delay(4), count_delay(0) {
+    Snake(Game* gameInstance) : game(gameInstance), nTail(3), dir('U') {
         x = WIDTH / 2;
         y = HEIGHT / 2;
-        for (int i =0;i <nTail;i++) {
+        for (int i =0;i <nTail;i++) { //inputing the coordinates for the tail
             xTail.push_back(WIDTH / 2);
             yTail.push_back(HEIGHT / 2 + i);
         }
@@ -117,16 +115,12 @@ public:
     }
 
     void move() {
-        if(count_delay == delay- difficulty){
             moveTails();
             if(dir =='U' && !collision(x, y-1)) y--;
             if(dir =='D' && !collision(x, y+1)) y++;
             if(dir =='L' && !collision(x-1, y)) x--;
             if(dir =='R' && !collision(x+1, y)) x++;
-            count_delay = 0;
         }
-        count_delay++;
-    }
 
     void moveTails() {
         if (nTail > int(xTail.size())) { //resizeing the vectors to store more data(double size than before)
@@ -273,10 +267,16 @@ void Startmenu(){
 
                 if(ch== 'y' || ch =='Y'){
                     writedata(x, y, data[2]);
-                    cout<<"\n           Grid Size Updated Please Restart The Game To See The Effect"<<endl;
+                    cout<<"\n           Grid Size Updated"<<endl;
+                    cout<<"             Restarting....."<<endl;
                     Sleep(4000);
                     setColor(7);//white
-                    exit(0);
+                    data =readdata(); //resetting the grid
+                    WIDTH =data[0];
+                    HEIGHT =data[1];
+                    map =vector<vector<int>>(HEIGHT, vector<int>(WIDTH, 0));
+                    Startmenu();
+                    break;
                 }
                 else{
                     setColor(7);
@@ -284,17 +284,27 @@ void Startmenu(){
                     writedata(50, 25, data[2]);
                 }
                 writedata(x, y, data[2]);
-                cout<<"\n            Grid Size Updated Please Restart The Game To See The Effect"<<endl;
+                cout<<"\n            Grid Size Updated"<<endl;
                 cout<<"              Restarting..."<<endl;
                 Sleep(3000);
-                exit(0);
+                data =readdata(); //resetting the grid
+                WIDTH =data[0];
+                HEIGHT =data[1];
+                map =vector<vector<int>>(HEIGHT, vector<int>(WIDTH, 0));
+                Startmenu();
+                break;
 
             }
             writedata(x, y, data[2]);
-            cout<<"\n            Grid Size Updated Please Restart The Game To See The Effect"<<endl;
+            cout<<"\n            Grid Size Updated"<<endl;
             cout<<"              Restarting..."<<endl;
             Sleep(3000);
-            exit(0);
+            data = readdata(); // Reseeting thr Grid 
+            WIDTH = data[0];
+            HEIGHT = data[1];
+            map = vector<vector<int>>(HEIGHT, vector<int>(WIDTH, 0));
+            Startmenu();
+            break;
 
 
         case 4:
@@ -406,7 +416,7 @@ RESTART:
         display();
         input();
         movements();
-        Sleep(10);
+        Sleep(200/(difficulty+1));
         if(game.getScore() > data[2]) writedata(WIDTH, HEIGHT, game.getScore()); //Updating High Score live in Runtime
     }
     gameOverScreen();
