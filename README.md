@@ -9,6 +9,8 @@ This is a **console-based Snake Game** developed in C++ using the Windows API fo
 ## Enviroment Details
 
 - This game was devloped specifically to work with **Windows** and also includes some of the features from the Windows api library
+  
+---
 
 ## Features
 
