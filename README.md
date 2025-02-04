@@ -6,6 +6,10 @@ This is a **console-based Snake Game** developed in C++ using the Windows API fo
 
 ---
 
+## Enviroment Details
+
+- This game was devloped specifically to work with **Windows** and also includes some of the features from the Windows api library
+
 ## Features
 
 - **Classic Snake Gameplay**: Navigate the snake to eat food and grow in size.
@@ -99,11 +103,11 @@ Handles:
 1. Open a terminal or **Command Prompt**.
 2. Run the following command to compile:
    ```sh
-   g++ snake_game.cpp -o snake_game.exe -std=c++11
+   g++ main.cpp -o Snake_game.exe
    ```
 3. Execute the game:
    ```sh
-   snake_game.exe
+   Snake_game.exe
    ```
 
 ---
