@@ -417,7 +417,10 @@ RESTART:
         input();
         movements();
         Sleep(200/(difficulty+1));
-        if(game.getScore() > data[2]) writedata(WIDTH, HEIGHT, game.getScore()); //Updating High Score live in Runtime
+        if(game.getScore() > data[2]) {
+            data[2] =game.getScore();
+            writedata(WIDTH, HEIGHT, game.getScore()); //Updating High Score live in Runtime
+        }
     }
     gameOverScreen();
     goto RESTART;
