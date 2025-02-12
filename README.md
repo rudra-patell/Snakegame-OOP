@@ -105,11 +105,11 @@ Handles:
 1. Open a terminal or **Command Prompt**.
 2. Run the following command to compile:
    ```sh
-   g++ main.cpp -o Snake_game.exe
+   g++ main.cpp -o Snake.exe
    ```
 3. Execute the game:
    ```sh
-   Snake_game.exe
+   Snake.exe
    ```
 
 ---
